@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Shift Reset V2</title>
+<title>Shift Reset V2 · Shift Runs</title>
 <style>
 :root{--bg:#f3efe9;--card:#fcfaf6;--sage:#6b7a62;--sagel:#e6eae2;--ink:#2a2a26;--mut:#6b6a63;--line:#e4dfd6;--warn:#a8706a}
 *{box-sizing:border-box}
@@ -89,41 +89,34 @@ function migrate(j){
   });
   return out;
 }
-function load(){try{var j=JSON.parse(localStorage.getItem(K));if(j)return migrate(j)}catch(e){}return {v:2,records:{},plan:Object.assign({},DP),nightDates:[]}}
+function load(){try{var j=JSON.parse(localStorage.getItem(K));if(j)return migrate(j)}catch(e){}return {v:2,records:{},plan:Object.assign({},DP),shiftEntries:[]}}
 function save(){try{localStorage.setItem(K,JSON.stringify(S))}catch(e){}}
 var S=load(),ui={tab:'today',mode:'pre',date:iso(new Date())};
 
 function rec(){return S.records[ui.date]}
-function nightDates(){return (S.nightDates||[]).slice().sort()}
-function nightRunInfo(date){
-  var ds=nightDates(),idx=ds.indexOf(date);
+function shiftEntries(){return (S.shiftEntries||[]).slice().sort(function(a,b){return a.date<b.date?-1:a.date>b.date?1:0})}
+function shiftRunInfo(date){
+  var es=shiftEntries(),idx=es.findIndex(function(e){return e.date===date});
   if(idx<0)return null;
-  var start=idx,end=idx;
-  while(start>0){
-    var a=new Date(ds[start-1]+'T12:00:00'),b=new Date(ds[start]+'T12:00:00');
-    if((b-a)/86400000!==1)break;
-    start--;
-  }
-  while(end<ds.length-1){
-    var c=new Date(ds[end]+'T12:00:00'),d=new Date(ds[end+1]+'T12:00:00');
-    if((d-c)/86400000!==1)break;
-    end++;
-  }
-  return {number:idx-start+1,total:end-start+1,start:ds[start],end:ds[end]};
+  var type=es[idx].type,start=idx,end=idx;
+  while(start>0){var prev=es[start-1],cur=es[start],a=new Date(prev.date+'T12:00:00'),b=new Date(cur.date+'T12:00:00');if(prev.type!==type||(b-a)/86400000!==1)break;start--;}
+  while(end<es.length-1){var cur2=es[end],next=es[end+1],c=new Date(cur2.date+'T12:00:00'),d=new Date(next.date+'T12:00:00');if(next.type!==type||(d-c)/86400000!==1)break;end++;}
+  return {number:idx-start+1,total:end-start+1,type:type,start:es[start].date,end:es[end].date};
 }
+function shiftLabel(type){return ({day:'Day',late:'Late',night:'Night',long:'Long day',off:'Off'})[type]||type}
 function contextInfo(){
   var r=rec();
   if(r&&r.type==='off')return {title:'Day off',detail:'Rest, reset, and choose what you need today.'};
   if(r&&r.post&&r.recoverySleep)return {title:'Recovering after sleep',detail:'Your post-shift check-in and recovery sleep are recorded.'};
   if(r&&r.post)return {title:'Just finished a shift',detail:'Check your recovery needs and keep the rest of today simple.'};
   if(r&&r.pre)return {title:'Starting a shift',detail:'Check in before work, then come back after your shift.'};
-  if(r&&r.type==='night')return {title:'Night shift planned',detail:'Your shift type is set to Night. Add the shift date to your night run in Plan.'};
+  if(r&&r.type)return {title:shiftLabel(r.type)+' shift planned',detail:'Your shift type is set. Add your rota dates in Plan to track the run.'};
   return {title:'Ready when you are',detail:'Choose your shift type and check in when it fits your day.'};
 }
 function contextCard(){
-  var c=contextInfo(),nr=nightRunInfo(ui.date);
-  return '<section class=\"card sage\"><div class=\"eyebrow\">Today at a glance</div><h2>'+c.title+'</h2><p style=\"margin:0;color:var(--mut)\">'+c.detail+'</p>'+
-    (nr?'<div class=\"bk\"><div><span>Consecutive night shift</span><b>Night '+nr.number+' of '+nr.total+'</b></div><div><span>Run dates</span><span>'+fmtDate(nr.start)+' – '+fmtDate(nr.end)+'</span></div></div>':'')+
+  var c=contextInfo(),run=shiftRunInfo(ui.date);
+  return '<section class="card sage"><div class="eyebrow">Today at a glance</div><h2>'+c.title+'</h2><p style="margin:0;color:var(--mut)">'+c.detail+'</p>'+
+    (run?'<div class="bk"><div><span>Consecutive '+shiftLabel(run.type).toLowerCase()+' shift</span><b>'+shiftLabel(run.type)+' '+run.number+' of '+run.total+'</b></div><div><span>Run dates</span><span>'+fmtDate(run.start)+' – '+fmtDate(run.end)+'</span></div></div>':'')+
     '</section>';
 }
 function ensure(kind){
@@ -189,22 +182,24 @@ function todayPost(){
 }
 function t2m(s){var a=(s||'0:0').split(':');return (+a[0])*60+(+a[1])}
 function m2t(m){m=((Math.round(m)%1440)+1440)%1440;var h=Math.floor(m/60),x=m%60;return (h<10?'0':'')+h+':'+(x<10?'0':'')+x}
-function nightRunCard(){
-  var ds=nightDates();
-  var rows=ds.map(function(d){
-    var nr=nightRunInfo(d);
-    return '<div class="bk"><div><span>'+fmtDate(d)+'</span><span><b>Night '+nr.number+' of '+nr.total+'</b></span></div><button class="btn" data-a="removeNightDate" data-v="'+d+'" style="margin-top:8px;padding:9px">Remove date</button></div>';
+function shiftRunCard(){
+  var es=shiftEntries();
+  var rows=es.map(function(e){
+    var run=shiftRunInfo(e.date);
+    return '<div class="bk"><div><span>'+fmtDate(e.date)+' · '+shiftLabel(e.type)+'</span><span>'+(run?shiftLabel(run.type)+' '+run.number+' of '+run.total:'')+'</span></div><button class="btn" data-a="removeShiftEntry" data-v="'+e.date+'" style="margin-top:8px;padding:9px">Remove date</button></div>';
   }).join('');
-  return '<section class="card"><div class="eyebrow">Consecutive night shifts</div><h2>Set your night run</h2><p class="note" style="margin-top:0">Add the date each night shift starts. Consecutive calendar dates are grouped automatically, so the app can show Night 1 of 4, Night 2 of 4, and so on. Add only your actual night-shift dates.</p>'+
-    '<label for="nightDate">Night shift start date</label><div class="row"><input type="date" id="nightDate" value="'+ui.date+'"><button class="btn pri" data-a="addNightDate" style="width:auto;padding:14px 18px">Add date</button></div>'+
-    (ds.length?'<div class="lbl">Your saved night shifts</div>'+rows:'<p class="empty" style="margin-top:14px">No night-shift dates added yet.</p>')+
-    '<p class="note">Dates are stored on this device in this browser. Export a backup from Insights to keep a copy.</p></section>';
+  return '<section class="card"><div class="eyebrow">Rota tracking</div><h2>Track your shift runs</h2><p class="note" style="margin-top:0">Add the date and type of each shift in your rota. The app groups consecutive calendar dates of the same shift type, such as Night 1 of 4 or Day 2 of 3. A gap or a different shift type starts a new run.</p>'+
+    '<label for="shiftDate">Shift date</label><input type="date" id="shiftDate" value="'+ui.date+'">'+
+    '<label for="shiftType">Shift type</label><select id="shiftType" style="width:100%;border:1px solid var(--line);background:var(--card);border-radius:30px;padding:14px 18px;font-size:17px;color:var(--ink);font-family:inherit"><option value="day">Day</option><option value="late">Late</option><option value="night">Night</option><option value="long">Long day</option></select>'+
+    '<button class="btn pri" data-a="addShiftEntry" style="margin-top:12px">Add shift to rota</button>'+
+    (es.length?'<div class="lbl">Saved rota dates</div>'+rows:'<p class="empty" style="margin-top:14px">No rota dates added yet.</p>')+
+    '<p class="note">An off day or a gap in dates breaks a run. Data is stored in this browser on this device. Export a backup from Insights.</p></section>';
 }
 function plan(){
   var p=S.plan,home=t2m(p.end)+(+p.commute),lights=home+110,wake=lights+p.sleep*60,leave=t2m(p.start)-p.commute;
   var usable=(((leave-wake)%1440)+1440)%1440;
   var tl=[['⌂','Home',home],['🍴','Eat + hydrate',home+20],['🚿','Shower',home+50],['☾','Wind down',home+80],['🛏','Lights out',lights,1],['☀','Wake',wake,1],['🍴','Food + get ready',wake+30],['⇥','Leave',leave]];
-  return '<h2 style="font-size:32px;margin-top:6px">Plan your recovery around a shift</h2>'+nightRunCard()+'<section class="card"><div class="eyebrow">Your shifts</div>'+
+  return '<h2 style="font-size:32px;margin-top:6px">Plan your recovery around a shift</h2>'+shiftRunCard()+'<section class="card"><div class="eyebrow">Your shifts</div>'+
   '<div class="row"><div style="flex:1"><label for="p1">Current shift ends</label><input type="time" id="p1" value="'+p.end+'"></div><div style="flex:1"><label for="p2">Next shift starts</label><input type="time" id="p2" value="'+p.start+'"></div></div>'+
   '<div class="row"><div style="flex:1"><label for="p3">Commute (minutes)</label><input type="number" id="p3" value="'+p.commute+'" min="0" step="5"></div><div style="flex:1"><label for="p4">Sleep target (hours)</label><input type="number" id="p4" value="'+p.sleep+'" min="1" max="14" step="0.5"></div></div>'+
   '<p class="note">Overnight shifts are handled automatically.</p></section>'+
@@ -256,7 +251,7 @@ function render(){
   if(ui.tab==='today')h='<div class="eyebrow">For nurses who work shifts</div><h1 style="margin:6px 0 4px">SHIFT RESET</h1><div class="sub">Recover better between shifts.</div>'+contextCard()+'<div class="seg"><button class="'+(ui.mode==='pre'?'on':'')+'" data-a="mode" data-v="pre">Before shift</button><button class="'+(ui.mode==='post'?'on':'')+'" data-a="mode" data-v="post">After shift</button></div>'+(ui.mode==='pre'?todayPre():todayPost());
   else h=ui.tab==='plan'?plan():insights();
   a.innerHTML=h+'<p class="fine">Your entries stay on this device. Don’t enter patient-identifiable information.<br>Self-management tool, not medical advice.</p>';
-  document.getElementById('nav').innerHTML=[['today','Today'],['plan','Plan'],['insights','Insights']].map(function(t){return '<button class="'+(ui.tab===t[0]?'on':'')+'" data-a="tab" data-v="'+t[0]+'">'+t[1].toUpperCase()+'</button>'}).join('');
+  var st=document.getElementById('shiftType');if(st){var existing=(S.shiftEntries||[]).find(function(e){return e.date===ui.date});if(existing)st.value=existing.type;else if(rec()&&rec().type&&rec().type!=='off')st.value=rec().type;}document.getElementById('nav').innerHTML=[['today','Today'],['plan','Plan'],['insights','Insights']].map(function(t){return '<button class="'+(ui.tab===t[0]?'on':'')+'" data-a="tab" data-v="'+t[0]+'">'+t[1].toUpperCase()+'</button>'}).join('');
 }
 function toggle(arr,v){var i=arr.indexOf(v);i>-1?arr.splice(i,1):arr.push(v)}
 document.addEventListener('click',function(e){
@@ -269,8 +264,8 @@ document.addEventListener('click',function(e){
   else if(a==='chk'){r=ensure('post');toggle(r.post.checks,+v);save()}
   else if(a==='deb'){r=ensure('post');r.post.debrief=r.post.debrief===v?null:v;save()}
   else if(a==='rs'){var x=parseFloat(document.getElementById('rsh').value);if(isNaN(x)||x<0||x>24)return;r=ensure('post');r.recoverySleep={hours:x,at:new Date().toISOString()};save()}
-  else if(a==='addNightDate'){var nd=document.getElementById('nightDate').value;if(nd){S.nightDates=S.nightDates||[];if(S.nightDates.indexOf(nd)<0)S.nightDates.push(nd);S.nightDates.sort();ui.date=nd;save()}}
-  else if(a==='removeNightDate'){S.nightDates=(S.nightDates||[]).filter(function(d){return d!==v});save()}
+  else if(a==='addShiftEntry'){var sd=document.getElementById('shiftDate').value,st=document.getElementById('shiftType').value;if(sd&&['day','late','night','long'].indexOf(st)>-1){S.shiftEntries=S.shiftEntries||[];S.shiftEntries=S.shiftEntries.filter(function(e){return e.date!==sd});S.shiftEntries.push({date:sd,type:st});S.shiftEntries.sort(function(a,b){return a.date<b.date?-1:a.date>b.date?1:0});ui.date=sd;var rr=S.records[sd];if(rr)rr.type=st;save()}}
+  else if(a==='removeShiftEntry'){S.shiftEntries=(S.shiftEntries||[]).filter(function(e){return e.date!==v});save()}
   else if(a==='exp'){var bl=new Blob([JSON.stringify(S,null,2)],{type:'application/json'}),u=URL.createObjectURL(bl),l=document.createElement('a');l.href=u;l.download='shift-reset-backup-'+iso(new Date())+'.json';l.click();setTimeout(function(){URL.revokeObjectURL(u)},500);return}
   else if(a==='imp'){document.getElementById('imp').click();return}
   render();
@@ -283,7 +278,7 @@ document.addEventListener('change',function(e){
   else if(id==='p1'||id==='p2'){S.plan[id==='p1'?'end':'start']=t.value||DP.end;save();render()}
   else if(id==='p3'){S.plan.commute=Math.max(0,+t.value||0);save();render()}
   else if(id==='p4'){S.plan.sleep=Math.min(14,Math.max(1,+t.value||7.5));save();render()}
-  else if(id==='imp'){var f=t.files[0];if(!f)return;var fr=new FileReader();fr.onload=function(){try{var m=migrate(JSON.parse(fr.result));S.records=Object.assign({},S.records,m.records);S.plan=Object.assign({},S.plan,m.plan);S.nightDates=Array.from(new Set((S.nightDates||[]).concat(m.nightDates||[]))).sort();save();render();alert('Backup imported.')}catch(x){alert('That file could not be read as a Shift Reset backup.')}};fr.readAsText(f);t.value=''}
+  else if(id==='imp'){var f=t.files[0];if(!f)return;var fr=new FileReader();fr.onload=function(){try{var m=migrate(JSON.parse(fr.result));S.records=Object.assign({},S.records,m.records);S.plan=Object.assign({},S.plan,m.plan);S.shiftEntries=(S.shiftEntries||[]).concat(m.shiftEntries||[]).filter(function(e,i,a){return a.findIndex(function(x){return x.date===e.date})===i}).sort(function(a,b){return a.date<b.date?-1:a.date>b.date?1:0});save();render();alert('Backup imported.')}catch(x){alert('That file could not be read as a Shift Reset backup.')}};fr.readAsText(f);t.value=''}
 });
 render();
 </script>
