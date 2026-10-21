@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Shift Reset V2 · Shift Runs</title>
+<style>
+:root{--bg:#f3efe9;--card:#fcfaf6;--sage:#6b7a62;--sagel:#e6eae2;--ink:#2a2a26;--mut:#6b6a63;--line:#e4dfd6;--warn:#a8706a}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 -apple-system,system-ui,"Segoe UI",sans-serif;padding-bottom:84px}
+main{max-width:480px;margin:0 auto;padding:22px 16px}
+h1,h2,.big{font-family:Georgia,"Times New Roman",serif;font-weight:400;margin:0}
+h1{font-size:40px;letter-spacing:.02em;line-height:1}
+h2{font-size:26px;line-height:1.15;margin:4px 0 14px}
+.eyebrow{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--mut);font-weight:600}
+.sub{color:var(--mut);font-size:18px;margin:6px 0 18px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:26px;padding:20px;margin-bottom:16px}
+.card.sage{background:var(--sagel)}
+.seg{display:flex;background:var(--card);border:1px solid var(--line);border-radius:30px;padding:5px;margin-bottom:16px}
+.seg button{flex:1;border:0;background:none;border-radius:26px;padding:14px 6px;font-weight:700;letter-spacing:.08em;font-size:14px;color:var(--ink);text-transform:uppercase}
+.seg button.on{background:var(--sage);color:#fff}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid var(--line);background:var(--card);border-radius:30px;padding:11px 18px;font-size:16px;color:var(--ink)}
+.chip.on{background:var(--sage);border-color:var(--sage);color:#fff}
+label,.lbl{display:block;font-weight:600;margin:14px 0 8px}
+input[type=date],input[type=time],input[type=number]{width:100%;border:1px solid var(--line);background:var(--card);border-radius:30px;padding:14px 18px;font-size:17px;color:var(--ink);font-family:inherit}
+input[type=range]{flex:1;accent-color:var(--sage)}
+.row{display:flex;gap:12px;align-items:center}.row>*{min-width:0}
+.pill{min-width:84px;text-align:center;border:1px solid var(--line);border-radius:30px;padding:12px;font-size:18px}
+.scale{display:flex;gap:8px}.scale button{flex:1;border:1px solid var(--line);background:var(--card);border-radius:30px;padding:13px 0;font-size:18px;color:var(--ink)}
+.scale button.on{background:var(--sage);border-color:var(--sage);color:#fff;font-weight:700}
+.hd{display:flex;justify-content:space-between;align-items:baseline;margin-top:18px}.hd span:last-child{font-size:14px;color:var(--mut)}
+.note{font-size:14px;color:var(--mut);margin:10px 0 0}
+.fine{text-align:center;color:var(--mut);font-size:14px;margin:22px 8px}
+.btn{width:100%;border:1px solid var(--line);background:var(--card);border-radius:30px;padding:15px;font-size:17px;font-weight:600;color:var(--ink)}
+.btn.pri{background:var(--sage);color:#fff;border-color:var(--sage)}
+.score{font-size:56px}.score small{font-size:24px;color:var(--mut)}
+.bar{height:10px;border-radius:6px;background:var(--line);overflow:hidden;margin:12px 0}.bar i{display:block;height:100%;background:#b08a4f}
+.bk{background:var(--bg);border-radius:18px;padding:14px 16px;margin-top:12px}
+.bk div{display:flex;justify-content:space-between;padding:3px 0;font-size:15px}.bk .t{font-weight:700;border-top:1px solid var(--line);margin-top:6px;padding-top:8px}
+.pri-i{display:flex;gap:10px;align-items:center;margin:8px 0;font-size:18px}
+.dot{width:30px;height:30px;border-radius:50%;background:var(--sage);color:#fff;display:grid;place-items:center;font-size:15px;flex:none}
+.ck{display:flex;gap:14px;align-items:center;padding:11px 0;font-size:17px;width:100%;background:none;border:0;text-align:left;color:var(--ink)}
+.box{width:26px;height:26px;border:2px solid var(--line);border-radius:7px;flex:none;display:grid;place-items:center;color:#fff}
+.ck.on .box{background:var(--sage);border-color:var(--sage)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:16px}.stat span{font-size:14px;color:var(--mut)}.stat b{display:block;font:400 32px Georgia,serif;margin-top:4px}
+.tl{display:flex;gap:14px;align-items:center;margin:0 0 18px}.tl .ic{width:44px;height:44px;border-radius:50%;background:var(--bg);border:1px solid var(--line);display:grid;place-items:center;flex:none}.tl .ic.d{background:var(--sage);color:#fff}
+.tl b{font:400 26px Georgia,serif;display:block}.tl small{letter-spacing:.14em;font-weight:700;color:var(--mut)}
+.slot{display:flex;justify-content:space-between;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:26px;padding:20px;margin-bottom:12px}.slot b{font:400 28px Georgia,serif}
+nav{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--line);display:flex;justify-content:center;padding-bottom:env(safe-area-inset-bottom,0)}
+nav div{display:flex;width:100%;max-width:480px}nav button{flex:1;border:0;background:none;padding:18px 0 16px;font-weight:700;letter-spacing:.14em;font-size:13px;color:var(--mut);border-top:4px solid transparent}
+nav button.on{color:var(--ink);border-top-color:var(--sage)}
+.empty{color:var(--mut);font-size:18px}
+:focus-visible{outline:3px solid #b08a4f;outline-offset:2px}
+</style>
+</head>
+<body>
+<main id="app"></main>
+<nav><div id="nav"></div></nav>
+<input type="file" id="imp" accept="application/json,.json" hidden>
+<script>
+var K='shiftreset.v2'; /* V2 night-run tracking and context-aware Today */
+var DP={end:'08:00',start:'19:30',commute:35,sleep:7.5};
+var TYPES=[['day','Day'],['late','Late'],['night','Night'],['long','Long day'],['off','Off']];
+var DRAIN=['Patient load','Staffing','Documentation/admin','Difficult interaction','Emotional load','Poor break','Physical fatigue','Poor sleep','Commute','Other'];
+var NEED=['Eat','Hydrate','Shower','Sleep','Quiet','Walk','Decompress','Talk to someone','Do nothing'];
+var CHECKS=['Ate something proper','Drank water','Sunglasses on the way home','Wind-down started on time','Phone away','Room dark and cool','Kept to my caffeine cutoff','Moved my body'];
+var DEBRIEF=['Just vent','Learn from it','Let it go'];
+var DEFAULT_SLEEP=7; /* internal score fallback only, never stored or counted as recorded sleep */
+
+function iso(d){var m=d.getMonth()+1,x=d.getDate();return d.getFullYear()+'-'+(m<10?'0':'')+m+'-'+(x<10?'0':'')+x}
+function fmtDate(s){var d=new Date(s+'T12:00:00');return d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}
+function migrate(j){
+  var recs=Array.isArray(j)?j:(Array.isArray(j.records)?j.records:Object.values(j.records||{}));
+  var out={v:2,records:{},plan:Object.assign({},DP,j.plan||{}),nightDates:Array.isArray(j.nightDates)?j.nightDates.filter(function(d){return typeof d==='string'&&/^\\d{4}-\\d{2}-\\d{2}$/.test(d)}):[]};
+  recs.forEach(function(r){
+    if(!r||!r.date)return;
+    r=JSON.parse(JSON.stringify(r));
+    if(r.post&&typeof r.post.sleepHours==='number'){
+      /* legacy v1: post check-in sleep is kept as pre-shift sleep, never as recovery sleep */
+      if(!(r.pre&&r.pre.sleepRecorded)){r.pre=r.pre||{energy:3,mood:3,stress:3};r.pre.sleepHours=r.post.sleepHours;r.pre.sleepRecorded=true;r.pre.legacy=true}
+      delete r.post.sleepHours;
+    }
+    if(r.pre&&typeof r.pre.sleepHours==='number'&&r.pre.sleepRecorded===undefined)r.pre.sleepRecorded=true;
+    if(r.pre&&typeof r.pre.sleepHours!=='number')r.pre.sleepRecorded=false;
+    if(r.recoverySleep&&typeof r.recoverySleep.hours!=='number')delete r.recoverySleep;
+    out.records[r.date]=r;
+  });
+  return out;
+}
+function load(){try{var j=JSON.parse(localStorage.getItem(K));if(j)return migrate(j)}catch(e){}return {v:2,records:{},plan:Object.assign({},DP),shiftEntries:[]}}
+function save(){try{localStorage.setItem(K,JSON.stringify(S))}catch(e){}}
+var S=load(),ui={tab:'today',mode:'pre',date:iso(new Date())};
+
+function rec(){return S.records[ui.date]}
+function shiftEntries(){return (S.shiftEntries||[]).slice().sort(function(a,b){return a.date<b.date?-1:a.date>b.date?1:0})}
+function shiftRunInfo(date){
+  var es=shiftEntries(),idx=es.findIndex(function(e){return e.date===date});
+  if(idx<0)return null;
+  var type=es[idx].type,start=idx,end=idx;
+  while(start>0){var prev=es[start-1],cur=es[start],a=new Date(prev.date+'T12:00:00'),b=new Date(cur.date+'T12:00:00');if(prev.type!==type||(b-a)/86400000!==1)break;start--;}
+  while(end<es.length-1){var cur2=es[end],next=es[end+1],c=new Date(cur2.date+'T12:00:00'),d=new Date(next.date+'T12:00:00');if(next.type!==type||(d-c)/86400000!==1)break;end++;}
+  return {number:idx-start+1,total:end-start+1,type:type,start:es[start].date,end:es[end].date};
+}
+function shiftLabel(type){return ({day:'Day',late:'Late',night:'Night',long:'Long day',off:'Off'})[type]||type}
+function contextInfo(){
+  var r=rec();
+  if(r&&r.type==='off')return {title:'Day off',detail:'Rest, reset, and choose what you need today.'};
+  if(r&&r.post&&r.recoverySleep)return {title:'Recovering after sleep',detail:'Your post-shift check-in and recovery sleep are recorded.'};
+  if(r&&r.post)return {title:'Just finished a shift',detail:'Check your recovery needs and keep the rest of today simple.'};
+  if(r&&r.pre)return {title:'Starting a shift',detail:'Check in before work, then come back after your shift.'};
+  if(r&&r.type)return {title:shiftLabel(r.type)+' shift planned',detail:'Your shift type is set. Add your rota dates in Plan to track the run.'};
+  return {title:'Ready when you are',detail:'Choose your shift type and check in when it fits your day.'};
+}
+function contextCard(){
+  var c=contextInfo(),run=shiftRunInfo(ui.date);
+  return '<section class="card sage"><div class="eyebrow">Today at a glance</div><h2>'+c.title+'</h2><p style="margin:0;color:var(--mut)">'+c.detail+'</p>'+
+    (run?'<div class="bk"><div><span>Consecutive '+shiftLabel(run.type).toLowerCase()+' shift</span><b>'+shiftLabel(run.type)+' '+run.number+' of '+run.total+'</b></div><div><span>Run dates</span><span>'+fmtDate(run.start)+' – '+fmtDate(run.end)+'</span></div></div>':'')+
+    '</section>';
+}
+function ensure(kind){
+  var r=S.records[ui.date]=S.records[ui.date]||{date:ui.date,type:null};
+  if(!r[kind])r[kind]=kind==='post'?{energy:3,mood:3,stress:3,drain:[],need:[],checks:[],debrief:null}:{energy:3,mood:3,stress:3};
+  return r;
+}
+function sleepRecorded(r){return !!(r&&r.pre&&r.pre.sleepRecorded&&typeof r.pre.sleepHours==='number')}
+/* Immediate post-shift score. Uses recorded pre-shift sleep, else the internal default. Never reads recoverySleep. */
+function score(r){
+  var p=r.post,hrs=sleepRecorded(r)?r.pre.sleepHours:DEFAULT_SLEEP;
+  var sl=Math.round(Math.min(hrs,8)/8*25),en=Math.round((p.energy-1)/4*25),mo=Math.round((p.mood-1)/4*15),st=Math.round((5-p.stress)/4*20),ha=Math.round((p.checks||[]).length/CHECKS.length*15);
+  return {sl:sl,en:en,mo:mo,st:st,ha:ha,total:sl+en+mo+st+ha};
+}
+
+function chips(list,sel,act){return list.map(function(x){var v=x[0],l=x[1],on=sel(v);return '<button class="chip'+(on?' on':'')+'" data-a="'+act+'" data-v="'+v+'">'+(on?'✓ ':'')+l+'</button>'}).join('')}
+function scale(kind,key,label,lo,hi){
+  var r=rec(),val=r&&r[kind]?r[kind][key]:3,b='';
+  for(var i=1;i<=5;i++)b+='<button class="'+(val===i?'on':'')+'" data-a="sc" data-k="'+key+'" data-v="'+i+'">'+i+'</button>';
+  return '<div class="hd"><b>'+label+'</b><span>1 '+lo+' → 5 '+hi+'</span></div><div class="scale" style="margin-top:8px">'+b+'</div>';
+}
+function whereCard(kind){
+  var r=rec(),started=r&&r[kind];
+  return '<section class="card"><div class="eyebrow">'+(kind==='pre'?'Before your shift':'After your shift')+'</div><h2>Where are you at?</h2>'+
+  '<label for="dt">Shift start date</label><input type="date" id="dt" value="'+ui.date+'">'+
+  '<div class="lbl">Shift type</div><div class="chips">'+chips(TYPES,function(v){return r&&r.type===v},'type')+'</div>'+
+  '<p class="note">'+(started?'Saved. Tap anything to change it.':'Nothing saved for this check-in yet. Any tap starts it.')+'</p></section>';
+}
+function todayPre(){
+  var r=rec(),rc=sleepRecorded(r),hrs=rc?r.pre.sleepHours:DEFAULT_SLEEP;
+  return whereCard('pre')+'<section class="card"><div class="eyebrow">How are you?</div><h2>Honest answers only</h2>'+
+  '<div class="lbl">Hours slept before this shift</div><div class="row"><input type="range" id="sl" min="0" max="14" step="0.5" value="'+hrs+'" aria-label="Hours slept"><div class="pill" id="slv" style="'+(rc?'':'color:var(--mut)')+'">'+(rc?hrs:'Not set')+'</div></div>'+
+  '<p class="note">'+(rc?'Recorded.':'Move the slider to record sleep. Until you do, no sleep is counted.')+'</p>'+
+  scale('pre','energy','Energy','flat','great')+scale('pre','mood','Mood','low','good')+scale('pre','stress','Stress','calm','high')+'</section>'+
+  '<section class="card sage"><div class="eyebrow">Before you go</div><h2>Set yourself up.</h2><div class="lbl" style="margin-top:0">PRIORITIES</div>'+
+  ['Eat before you go','Fill your water bottle','Pack food for your break'].map(function(t){return '<div class="pri-i"><span class="dot">✓</span>'+t+'</div>'}).join('')+
+  '<button class="btn" style="margin-top:14px" data-a="mode" data-v="post">After the shift, check in here</button><p class="note">Supportive suggestions, not medical advice.</p></section>';
+}
+function todayPost(){
+  var r=rec(),h=whereCard('post')+'<section class="card"><div class="eyebrow">How are you?</div><h2>Honest answers only</h2>'+
+  scale('post','energy','Energy','flat','great')+scale('post','mood','Mood','low','good')+scale('post','stress','Stress','calm','high')+'</section>';
+  if(!(r&&r.post))return h+'<p class="empty" style="text-align:center">Tap an answer to see your recovery score.</p>';
+  var p=r.post,s=score(r),low=s.total<45,mid=s.total<70;
+  var title=low?'Keep things light.':mid?'Steady does it.':'You’re in good shape.';
+  var msg=low?'Do the essentials and let the rest be optional.':mid?'Look after the basics, then rest.':'Protect your sleep and keep it simple.';
+  var pr=p.need.length?p.need:(low?['Eat something','Hydrate']:mid?['Eat something','Hydrate','Wind down']:['Protect your sleep','Gentle movement']);
+  var done=p.checks.length;
+  h+='<section class="card"><div class="eyebrow">Shift recovery score</div><div class="big score">'+s.total+' <small>/ 100</small></div><b>'+title+'</b><div style="color:var(--mut)">'+msg+'</div><div class="bar"><i style="width:'+s.total+'%"></i></div>'+
+  '<div class="bk"><div><span>Sleep</span><span>+'+s.sl+' of 25</span></div><div><span>Energy</span><span>+'+s.en+' of 25</span></div><div><span>Mood</span><span>+'+s.mo+' of 15</span></div><div><span>Low stress</span><span>+'+s.st+' of 20</span></div><div><span>Habits</span><span>+'+s.ha+' of 15</span></div><div class="t"><span>Total</span><span>'+s.total+'</span></div></div>'+
+  '<p class="note">'+(sleepRecorded(r)?'Sleep uses your recorded pre-shift hours.':'No pre-shift sleep recorded, so a neutral 7h is used for this score only.')+' Self-management indicator, not a medical or validated score. Recovery sleep logged later does not change it.</p></section>';
+  h+='<section class="card"><div class="eyebrow">What drained you?</div><h2>Pick any that apply</h2><div class="chips">'+chips(DRAIN.map(function(x){return [x,x]}),function(v){return p.drain.indexOf(v)>-1},'drain')+'</div></section>';
+  h+='<section class="card"><div class="eyebrow">What do you need now?</div><h2>Be selfish here</h2><div class="chips">'+chips(NEED.map(function(x){return [x,x]}),function(v){return p.need.indexOf(v)>-1},'need')+'</div></section>';
+  h+='<section class="card sage"><div class="eyebrow">Your reset</div><h2>'+title.replace('You’re in good shape.','Keep it simple.')+'</h2><p>'+msg+'</p><div class="lbl">PRIORITIES</div>'+pr.map(function(t){return '<div class="pri-i"><span class="dot">✓</span>'+t+'</div>'}).join('')+
+  (low?'<div class="lbl">THINGS THAT CAN WAIT</div><div style="color:var(--mut)">Laundry, cleaning, life admin, non-essential errands</div>':'')+'<p class="note">Supportive suggestions, not medical advice.</p></section>';
+  h+='<section class="card"><div class="eyebrow">Recovery checklist</div><h2>The unglamorous basics</h2><div class="row"><div class="bar" style="flex:1"><i style="width:'+Math.round(done/CHECKS.length*100)+'%"></i></div><b>'+Math.round(done/CHECKS.length*100)+'%</b></div>'+
+  CHECKS.map(function(c,i){var on=p.checks.indexOf(i)>-1;return '<button class="ck'+(on?' on':'')+'" data-a="chk" data-v="'+i+'"><span class="box">'+(on?'✓':'')+'</span>'+c+'</button>'}).join('')+'</section>';
+  var rs=r.recoverySleep;
+  h+='<section class="card"><div class="eyebrow">Recovery sleep</div><h2>After you wake up</h2><p class="note" style="margin-top:0">Log how long you slept after this shift. It stays separate from your pre-shift sleep and your score.</p>'+
+  '<div class="row" style="margin-top:12px"><input type="number" id="rsh" min="0" max="24" step="0.5" inputmode="decimal" placeholder="Hours" value="'+(rs?rs.hours:'')+'"><button class="btn pri" style="width:auto;padding:15px 22px" data-a="rs">'+(rs?'Update':'Save')+'</button></div>'+
+  (rs?'<p class="note">Logged: '+rs.hours+'h at '+new Date(rs.at).toLocaleString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})+'</p>':'')+'</section>';
+  h+='<section class="card"><div class="eyebrow">Quick debrief</div><h2>Anything you want out of your head?</h2><div class="chips">'+chips(DEBRIEF.map(function(x){return [x,x]}),function(v){return p.debrief===v},'deb')+'</div><p class="note">Pick one, or skip it. That’s allowed too. Kept only on this device.</p></section>';
+  return h;
+}
+function t2m(s){var a=(s||'0:0').split(':');return (+a[0])*60+(+a[1])}
+function m2t(m){m=((Math.round(m)%1440)+1440)%1440;var h=Math.floor(m/60),x=m%60;return (h<10?'0':'')+h+':'+(x<10?'0':'')+x}
+function shiftRunCard(){
+  var es=shiftEntries();
+  var rows=es.map(function(e){
+    var run=shiftRunInfo(e.date);
+    return '<div class="bk"><div><span>'+fmtDate(e.date)+' · '+shiftLabel(e.type)+'</span><span>'+(run?shiftLabel(run.type)+' '+run.number+' of '+run.total:'')+'</span></div><button class="btn" data-a="removeShiftEntry" data-v="'+e.date+'" style="margin-top:8px;padding:9px">Remove date</button></div>';
+  }).join('');
+  return '<section class="card"><div class="eyebrow">Rota tracking</div><h2>Track your shift runs</h2><p class="note" style="margin-top:0">Add the date and type of each shift in your rota. The app groups consecutive calendar dates of the same shift type, such as Night 1 of 4 or Day 2 of 3. A gap or a different shift type starts a new run.</p>'+
+    '<label for="shiftDate">Shift date</label><input type="date" id="shiftDate" value="'+ui.date+'">'+
+    '<label for="shiftType">Shift type</label><select id="shiftType" style="width:100%;border:1px solid var(--line);background:var(--card);border-radius:30px;padding:14px 18px;font-size:17px;color:var(--ink);font-family:inherit"><option value="day">Day</option><option value="late">Late</option><option value="night">Night</option><option value="long">Long day</option></select>'+
+    '<button class="btn pri" data-a="addShiftEntry" style="margin-top:12px">Add shift to rota</button>'+
+    (es.length?'<div class="lbl">Saved rota dates</div>'+rows:'<p class="empty" style="margin-top:14px">No rota dates added yet.</p>')+
+    '<p class="note">An off day or a gap in dates breaks a run. Data is stored in this browser on this device. Export a backup from Insights.</p></section>';
+}
+function plan(){
+  var p=S.plan,home=t2m(p.end)+(+p.commute),lights=home+110,wake=lights+p.sleep*60,leave=t2m(p.start)-p.commute;
+  var usable=(((leave-wake)%1440)+1440)%1440;
+  var tl=[['⌂','Home',home],['🍴','Eat + hydrate',home+20],['🚿','Shower',home+50],['☾','Wind down',home+80],['🛏','Lights out',lights,1],['☀','Wake',wake,1],['🍴','Food + get ready',wake+30],['⇥','Leave',leave]];
+  return '<h2 style="font-size:32px;margin-top:6px">Plan your recovery around a shift</h2>'+shiftRunCard()+'<section class="card"><div class="eyebrow">Your shifts</div>'+
+  '<div class="row"><div style="flex:1"><label for="p1">Current shift ends</label><input type="time" id="p1" value="'+p.end+'"></div><div style="flex:1"><label for="p2">Next shift starts</label><input type="time" id="p2" value="'+p.start+'"></div></div>'+
+  '<div class="row"><div style="flex:1"><label for="p3">Commute (minutes)</label><input type="number" id="p3" value="'+p.commute+'" min="0" step="5"></div><div style="flex:1"><label for="p4">Sleep target (hours)</label><input type="number" id="p4" value="'+p.sleep+'" min="1" max="14" step="0.5"></div></div>'+
+  '<p class="note">Overnight shifts are handled automatically.</p></section>'+
+  '<section class="card sage" style="text-align:center"><div class="eyebrow">Usable time</div><div class="big" style="font-size:56px;margin:8px 0">'+Math.floor(usable/60)+'h '+(usable%60<10?'0':'')+usable%60+'m</div><div style="color:var(--mut)">between waking and leaving.</div></section>'+
+  [['⌂','Home',home],['☕','Last caffeine',lights-360],['🛏','Lights out',lights],['☀','Wake',wake]].map(function(x){return '<div class="slot"><span>'+x[0]+' &nbsp;'+x[1]+'</span><b>'+m2t(x[2])+'</b></div>'}).join('')+
+  '<section class="card"><div class="eyebrow">Recovery timeline</div><div style="margin-top:16px">'+tl.map(function(x){return '<div class="tl"><div class="ic'+(x[3]?' d':'')+'">'+x[0]+'</div><div><b>'+m2t(x[2])+'</b><small>'+x[1].toUpperCase()+'</small></div></div>'}).join('')+'</div><p class="note">Last caffeine is about six hours before lights out.</p></section>'+
+  '<section class="card"><div class="eyebrow">Minimum viable human</div><h2>After a rough shift, your only priorities are:</h2><ol style="font-size:18px;line-height:1.9;padding-left:22px;margin:0"><li>Get home safely</li><li>Eat something</li><li>Hydrate</li><li>Wind down</li><li>Protect sleep</li><li>Everything else can wait</li></ol></section>';
+}
+function avg(a){return a.length?a.reduce(function(x,y){return x+y},0)/a.length:null}
+function f1(n,u){return n==null?'n/a':(Math.round(n*10)/10)+(u||'')}
+function insights(){
+  var cut=new Date();cut.setDate(cut.getDate()-30);var cs=iso(cut);
+  var rs=Object.values(S.records).filter(function(r){return r.date>=cs}).sort(function(a,b){return a.date<b.date?-1:1});
+  var withPost=rs.filter(function(r){return r.post}),pre=rs.filter(sleepRecorded);
+  var avgPre=avg(pre.map(function(r){return r.pre.sleepHours}));
+  var recS=rs.filter(function(r){return r.recoverySleep&&typeof r.recoverySleep.hours==='number'}).map(function(r){return r.recoverySleep.hours});
+  var scores=withPost.map(function(r){return score(r).total});
+  var nights=rs.filter(function(r){return r.type==='night'}).length;
+  var under6=pre.filter(function(r){return r.pre.sleepHours<6}).length;
+  var both=rs.filter(function(r){return r.pre&&r.post});
+  var n=rs.length;
+  /* chart: bars = recorded pre-shift sleep only, line = post energy where logged. Gaps are not filled. */
+  var W=300,H=130,bw=26,gap=10,bars='',pts=[];
+  rs.slice(-9).forEach(function(r,i){var x=10+i*(bw+gap);
+    if(sleepRecorded(r)){var h=Math.min(r.pre.sleepHours,12)/12*100;bars+='<rect x="'+x+'" y="'+(H-10-h)+'" width="'+bw+'" height="'+h+'" rx="6" fill="'+(r.pre.sleepHours<6?'#c4a09b':'#8a9a80')+'"/>'}
+    if(r.post)pts.push((x+bw/2)+','+(H-10-(r.post.energy-1)/4*100));});
+  var chart=(bars||pts.length)?'<svg viewBox="0 0 '+W+' '+H+'" width="100%" role="img" aria-label="Pre-shift sleep bars and energy line">'+bars+(pts.length>1?'<polyline points="'+pts.join(' ')+'" fill="none" stroke="#b08a4f" stroke-width="2"/>':'')+pts.map(function(p){var c=p.split(',');return '<circle cx="'+c[0]+'" cy="'+c[1]+'" r="3.5" fill="#b08a4f"/>'}).join('')+'</svg>':'<p class="empty">Nothing to chart yet.</p>';
+  var trend='';
+  if(scores.length>=14){var a=avg(scores.slice(-7)),b=avg(scores.slice(-14,-7));trend='Last 7 entries average '+f1(a)+' vs '+f1(b)+' before ('+(a>b?'up':a<b?'down':'flat')+').'}else trend='Trend after 14 entries ('+scores.length+' so far).';
+  var pat='Not enough to say yet. Patterns start after 7 check-ins. You have '+withPost.length+'.';
+  if(withPost.length>=7){var cnt={};withPost.forEach(function(r){r.post.drain.forEach(function(d){cnt[d]=(cnt[d]||0)+1})});var top=Object.keys(cnt).sort(function(a,b){return cnt[b]-cnt[a]})[0];pat=top?'Your most picked drain is “'+top+'” ('+cnt[top]+' times).':'No drains picked yet.'}
+  var help='This appears after 10 check-ins, so there’s enough to compare. You have '+withPost.length+'.';
+  if(withPost.length>=10){var g=withPost.filter(function(r){return sleepRecorded(r)&&r.pre.sleepHours>=7}).map(function(r){return score(r).total}),l=withPost.filter(function(r){return sleepRecorded(r)&&r.pre.sleepHours<7}).map(function(r){return score(r).total});help=(g.length&&l.length)?'Shifts after 7h+ sleep averaged '+f1(avg(g))+' recovery, vs '+f1(avg(l))+' after less.':'Record pre-shift sleep on more shifts to compare.'}
+  var streak=0,prev=null;for(var i=rs.length-1;i>=0;i--){var d=new Date(rs[i].date+'T12:00:00');if(prev&&(prev-d)/864e5>4)break;streak++;prev=d}
+  return '<h2 style="font-size:32px;margin-top:6px">Your last 30 days</h2><div class="grid">'+
+  '<div class="stat"><span>Avg pre-shift sleep</span><b>'+f1(avgPre,'h')+'</b></div><div class="stat"><span>Avg recovery sleep</span><b>'+f1(avg(recS),'h')+'</b></div>'+
+  '<div class="stat"><span>Average energy</span><b>'+(withPost.length?f1(avg(withPost.map(function(r){return r.post.energy}))):'n/a')+' / 5</b></div><div class="stat"><span>Average recovery</span><b>'+(scores.length?Math.round(avg(scores)):'n/a')+'</b></div>'+
+  '<div class="stat"><span>Night shifts logged</span><b>'+nights+'</b></div><div class="stat"><span>Pre-shift sleep under 6h</span><b>'+under6+'</b></div></div>'+
+  '<section class="card"><div class="eyebrow">Pre-shift sleep and energy</div><div style="margin:12px 0">'+chart+'</div><p class="note">Bars: recorded pre-shift sleep. Line: energy after shift. Only days you logged are shown. Gaps aren’t filled in.</p></section>'+
+  '<section class="card"><div class="eyebrow">Recovery trend</div><div class="big" style="font-size:36px">'+(scores.length?Math.round(avg(scores)):'n/a')+' avg</div><p class="note">'+trend+' Descriptive only.</p></section>'+
+  '<section class="card"><div class="eyebrow">Your patterns</div><p style="font-size:18px;margin:8px 0">'+pat+'</p><p class="note">Observations from your own entries, not medical conclusions.</p></section>'+
+  '<section class="card"><div class="eyebrow">What helps me recover?</div><p style="font-size:18px;margin:8px 0">'+help+'</p><p class="note">Associations in your own entries only. Not proof that one thing leads to another.</p></section>'+
+  '<section class="card"><div class="eyebrow">Check-in streak</div><h2 style="margin-top:8px">You’ve checked in for '+streak+' shift'+(streak===1?'':'s')+' in a row.</h2><p class="note">Missed a day? Fine. Shifts happen. Pick it back up whenever.</p></section>'+
+  '<section class="card"><div class="eyebrow">Before vs after</div><h2>What a shift takes out of you</h2>'+(both.length?'<div class="grid" style="margin:0"><div class="stat" style="background:var(--bg)"><span>Energy before</span><b>'+f1(avg(both.map(function(r){return r.pre.energy})))+' / 5</b></div><div class="stat" style="background:var(--bg)"><span>Energy after</span><b>'+f1(avg(both.map(function(r){return r.post.energy})))+' / 5</b></div></div><p class="note">From '+both.length+' shift'+(both.length===1?'':'s')+' with both check-ins.</p>':'<p class="empty">Needs a before and after check-in on the same shift.</p>')+'</section>'+
+  '<section class="card"><div class="eyebrow">Your data</div><h2>Backup</h2><p class="note" style="margin-top:0">Your entries stay on this device. No accounts, no tracking. Export a backup if you switch phones.</p><div class="row" style="margin-top:14px"><button class="btn pri" data-a="exp">Export backup</button><button class="btn" data-a="imp">Import backup</button></div></section>';
+}
+function render(){
+  var a=document.getElementById('app'),h='';
+  if(ui.tab==='today')h='<div class="eyebrow">For nurses who work shifts</div><h1 style="margin:6px 0 4px">SHIFT RESET</h1><div class="sub">Recover better between shifts.</div>'+contextCard()+'<div class="seg"><button class="'+(ui.mode==='pre'?'on':'')+'" data-a="mode" data-v="pre">Before shift</button><button class="'+(ui.mode==='post'?'on':'')+'" data-a="mode" data-v="post">After shift</button></div>'+(ui.mode==='pre'?todayPre():todayPost());
+  else h=ui.tab==='plan'?plan():insights();
+  a.innerHTML=h+'<p class="fine">Your entries stay on this device. Don’t enter patient-identifiable information.<br>Self-management tool, not medical advice.</p>';
+  var st=document.getElementById('shiftType');if(st){var existing=(S.shiftEntries||[]).find(function(e){return e.date===ui.date});if(existing)st.value=existing.type;else if(rec()&&rec().type&&rec().type!=='off')st.value=rec().type;}document.getElementById('nav').innerHTML=[['today','Today'],['plan','Plan'],['insights','Insights']].map(function(t){return '<button class="'+(ui.tab===t[0]?'on':'')+'" data-a="tab" data-v="'+t[0]+'">'+t[1].toUpperCase()+'</button>'}).join('');
+}
+function toggle(arr,v){var i=arr.indexOf(v);i>-1?arr.splice(i,1):arr.push(v)}
+document.addEventListener('click',function(e){
+  var b=e.target.closest('[data-a]');if(!b)return;var a=b.dataset.a,v=b.dataset.v,kind=ui.mode,r;
+  if(a==='tab'){ui.tab=v;window.scrollTo(0,0)}
+  else if(a==='mode'){ui.mode=v;window.scrollTo(0,0)}
+  else if(a==='type'){r=ensure(kind);r.type=r.type===v?null:v;save()}
+  else if(a==='sc'){r=ensure(kind);r[kind][b.dataset.k]=+v;save()}
+  else if(a==='drain'||a==='need'){r=ensure('post');toggle(r.post[a],v);save()}
+  else if(a==='chk'){r=ensure('post');toggle(r.post.checks,+v);save()}
+  else if(a==='deb'){r=ensure('post');r.post.debrief=r.post.debrief===v?null:v;save()}
+  else if(a==='rs'){var x=parseFloat(document.getElementById('rsh').value);if(isNaN(x)||x<0||x>24)return;r=ensure('post');r.recoverySleep={hours:x,at:new Date().toISOString()};save()}
+  else if(a==='addShiftEntry'){var sd=document.getElementById('shiftDate').value,st=document.getElementById('shiftType').value;if(sd&&['day','late','night','long'].indexOf(st)>-1){S.shiftEntries=S.shiftEntries||[];S.shiftEntries=S.shiftEntries.filter(function(e){return e.date!==sd});S.shiftEntries.push({date:sd,type:st});S.shiftEntries.sort(function(a,b){return a.date<b.date?-1:a.date>b.date?1:0});ui.date=sd;var rr=S.records[sd];if(rr)rr.type=st;save()}}
+  else if(a==='removeShiftEntry'){S.shiftEntries=(S.shiftEntries||[]).filter(function(e){return e.date!==v});save()}
+  else if(a==='exp'){var bl=new Blob([JSON.stringify(S,null,2)],{type:'application/json'}),u=URL.createObjectURL(bl),l=document.createElement('a');l.href=u;l.download='shift-reset-backup-'+iso(new Date())+'.json';l.click();setTimeout(function(){URL.revokeObjectURL(u)},500);return}
+  else if(a==='imp'){document.getElementById('imp').click();return}
+  render();
+});
+document.addEventListener('input',function(e){if(e.target.id==='sl'){var p=document.getElementById('slv');p.textContent=e.target.value;p.style.color=''}});
+document.addEventListener('change',function(e){
+  var t=e.target,id=t.id;
+  if(id==='sl'){var r=ensure('pre');r.pre.sleepHours=parseFloat(t.value);r.pre.sleepRecorded=true;delete r.pre.legacy;save();render()}
+  else if(id==='dt'){if(t.value){ui.date=t.value;render()}}
+  else if(id==='p1'||id==='p2'){S.plan[id==='p1'?'end':'start']=t.value||DP.end;save();render()}
+  else if(id==='p3'){S.plan.commute=Math.max(0,+t.value||0);save();render()}
+  else if(id==='p4'){S.plan.sleep=Math.min(14,Math.max(1,+t.value||7.5));save();render()}
+  else if(id==='imp'){var f=t.files[0];if(!f)return;var fr=new FileReader();fr.onload=function(){try{var m=migrate(JSON.parse(fr.result));S.records=Object.assign({},S.records,m.records);S.plan=Object.assign({},S.plan,m.plan);S.shiftEntries=(S.shiftEntries||[]).concat(m.shiftEntries||[]).filter(function(e,i,a){return a.findIndex(function(x){return x.date===e.date})===i}).sort(function(a,b){return a.date<b.date?-1:a.date>b.date?1:0});save();render();alert('Backup imported.')}catch(x){alert('That file could not be read as a Shift Reset backup.')}};fr.readAsText(f);t.value=''}
+});
+render();
+</script>
+</body>
+</html>
